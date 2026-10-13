@@ -1,5 +1,5 @@
 /* OtakuVault: service worker (modo offline / PWA) */
-const CACHE = 'otakuvault-v3';
+const CACHE = 'otakuvault-v4';
 const ARQUIVOS = ['./', 'index.html', 'manifest.json', 'icone.jpg'];
 
 /* instala e guarda os arquivos do app */
@@ -23,10 +23,10 @@ self.addEventListener('fetch', e => {
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
 
-  /* página: tenta a internet primeiro; sem internet usa a versão guardada */
+  /* página: sempre busca a versão mais nova na internet (ignora o cache do GitHub); sem internet usa a guardada */
   if (r.mode === 'navigate') {
     e.respondWith(
-      fetch(r)
+      fetch(r, { cache: 'no-store' })
         .then(res => {
           const copia = res.clone();
           caches.open(CACHE).then(c => c.put('index.html', copia));
