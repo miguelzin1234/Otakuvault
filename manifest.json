@@ -1,0 +1,24 @@
+{
+  "name": "OtakuVault",
+  "short_name": "OtakuVault",
+  "description": "Sua biblioteca pessoal de animes",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05070d",
+  "theme_color": "#05070d",
+  "lang": "pt-BR",
+  "categories": [
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "icone.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

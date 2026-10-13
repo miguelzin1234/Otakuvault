@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>OtakuVault</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OtakuVault">
+<link rel="manifest" href="manifest.json" id="mf">
+<link rel="icon" href="icone.jpg" type="image/jpeg">
+<link rel="apple-touch-icon" href="icone.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  --bg:#05070d; --bg2:#0a1020; --card:#0c1426; --card2:#111c33;
+  --line:rgba(70,160,255,.18); --neon:#2ea8ff; --neon2:#00e5ff;
+  --text:#e9f2ff; --muted:#8ea3c7; --danger:#ff5d7a;
+  --glow:0 0 0 1px rgba(46,168,255,.35),0 0 28px rgba(46,168,255,.35);
+  --display:'Chakra Petch','Trebuchet MS',system-ui,sans-serif;
+  --body:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;
+  background-image:radial-gradient(900px 500px at 15% -10%,rgba(46,168,255,.16),transparent 60%),radial-gradient(700px 500px at 100% 10%,rgba(0,229,255,.08),transparent 60%);
+  background-attachment:fixed;padding-bottom:120px;overflow-x:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:.2px}
+:focus-visible{outline:2px solid var(--neon2);outline-offset:2px;border-radius:10px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:linear-gradient(var(--bg) 40%,rgba(5,7,13,0));padding:12px 0 14px}
+.top .wrap{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:20px}
+.logo svg{filter:drop-shadow(0 0 8px rgba(46,168,255,.8))}
+.logo b{background:linear-gradient(90deg,#fff,var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:linear-gradient(135deg,var(--neon),#6a5cff);box-shadow:var(--glow)}
+
+/* pages */
+#view{animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pg h1{font-size:28px;margin:6px 0 14px}
+.sub{color:var(--muted);margin:-8px 0 14px}
+
+/* search & chips */
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 14px;height:50px;transition:.2s}
+.search:focus-within{border-color:var(--neon);box-shadow:var(--glow)}
+.search input{flex:1;background:none;border:0;outline:0;min-width:0;height:100%}
+.search input::placeholder{color:#5d7096}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:14px;transition:.2s;white-space:nowrap}
+.chip.on{background:linear-gradient(135deg,rgba(46,168,255,.28),rgba(0,229,255,.12));border-color:var(--neon);color:#fff;box-shadow:0 0 18px rgba(46,168,255,.25)}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin:10px 0}
+.seg button{padding:7px 14px;border-radius:10px;color:var(--muted);font-size:14px;transition:.2s}
+.seg button.on{background:var(--card2);color:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.count{color:var(--muted);font-size:13px;margin:6px 2px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+select.sort{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 10px;color:var(--text)}
+
+/* grid & cards */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:18px}}
+.card{position:relative;border-radius:24px;overflow:hidden;background:var(--card);cursor:pointer;
+  box-shadow:0 14px 30px rgba(0,0,0,.55),0 0 0 1px var(--line);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+@media(hover:hover){.card:hover{transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 0 1px var(--neon),0 0 30px rgba(46,168,255,.28)}}
+.card:active{transform:scale(.985)}
+.cv{position:relative;aspect-ratio:2/3;background:var(--card2)}
+.cv img{width:100%;height:100%;object-fit:cover;display:block}
+.cv::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,10,.96) 0%,rgba(3,5,10,.55) 38%,rgba(3,5,10,0) 62%)}
+.st{position:absolute;z-index:2;left:10px;top:10px;font-size:11.5px;font-weight:600;padding:5px 9px;border-radius:999px;background:rgba(5,7,13,.72);backdrop-filter:blur(8px);border:1px solid currentColor}
+.fav{position:absolute;z-index:2;right:8px;top:8px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(5,7,13,.65);backdrop-filter:blur(8px);color:#a4b4d4;font-size:17px;transition:.2s}
+.fav.on{color:#ff4d79;box-shadow:0 0 16px rgba(255,77,121,.55);animation:pop .35s}
+@keyframes pop{40%{transform:scale(1.35)}}
+.ov{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:12px 13px 13px}
+.ov h3{font-size:15px;line-height:1.2;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:12px;color:#b6c6e6;display:flex;justify-content:space-between;gap:6px}
+.rate{color:#ffd35c;font-weight:600}
+.rate.zero{color:#6d7fa3;font-weight:400}
+.pbar{position:absolute;z-index:3;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.1)}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));box-shadow:0 0 10px var(--neon)}
+
+/* rows */
+.row{margin:26px 0}
+.rh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.rh h2{font-size:20px}
+.rh span{color:var(--muted);font-size:13px}
+.rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 2px 18px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail .card{flex:none;width:152px;scroll-snap-align:start}
+@media(min-width:700px){.rail .card{width:184px}}
+
+/* hero */
+.hero{position:relative;border-radius:30px;overflow:hidden;padding:20px;margin:6px 0 4px;border:1px solid var(--line);
+  box-shadow:0 0 0 1px rgba(46,168,255,.12),0 24px 60px rgba(0,0,0,.6),0 0 70px rgba(46,168,255,.14);isolation:isolate}
+.hero .bgimg{position:absolute;inset:-20px;z-index:-2;background-size:cover;background-position:center;filter:blur(28px) saturate(1.4);opacity:.55}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(5,7,13,.92),rgba(5,7,13,.4))}
+.hero .in{display:flex;gap:18px;align-items:flex-end}
+.hero img{width:118px;border-radius:18px;aspect-ratio:2/3;object-fit:cover;box-shadow:0 14px 34px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.12);flex:none}
+@media(min-width:700px){.hero{padding:30px}.hero img{width:180px}.hero h2{font-size:34px!important}}
+.hero small{color:var(--neon2);font-weight:600;font-size:13px}
+.hero h2{font-size:24px;margin:4px 0 6px;line-height:1.1}
+.hero p{margin:0 0 12px;color:#c3d1ee;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-width:520px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:14px;font-weight:600;background:linear-gradient(135deg,var(--neon),#5a78ff);color:#fff;box-shadow:0 8px 24px rgba(46,168,255,.35);transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--card2);box-shadow:inset 0 0 0 1px var(--line);color:var(--text)}
+.btn.danger{background:rgba(255,93,122,.14);color:#ff8fa5;box-shadow:inset 0 0 0 1px rgba(255,93,122,.4)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.tags span{font-size:12px;padding:3px 9px;border-radius:999px;background:rgba(46,168,255,.12);color:#9fd2ff}
+
+/* empty */
+.empty{text-align:center;padding:46px 20px;border:1px dashed var(--line);border-radius:26px;color:var(--muted);background:rgba(12,20,38,.5)}
+.empty .big{font-size:42px;margin-bottom:8px}
+.empty p{margin:0 0 16px}
+
+/* dock */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:0 12px env(safe-area-inset-bottom,0px);pointer-events:none}
+.pill{pointer-events:auto;max-width:560px;margin:0 auto 10px;display:grid;grid-template-columns:1fr 1fr 62px 1fr 1fr 1fr;align-items:center;gap:2px;padding:7px;border-radius:26px;
+  background:rgba(10,16,32,.82);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 18px 40px rgba(0,0,0,.65),0 0 0 1px var(--line)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;border-radius:19px;color:var(--muted);font-size:11.5px;transition:.25s}
+.tab .ic{font-size:21px;filter:grayscale(1) opacity(.7);transition:.25s}
+.tab.on{color:#fff;background:linear-gradient(180deg,rgba(46,168,255,.28),rgba(46,168,255,.06));box-shadow:inset 0 0 0 1px rgba(46,168,255,.5),0 0 22px rgba(46,168,255,.3)}
+.tab.on .ic{filter:none;transform:translateY(-1px) scale(1.08)}
+
+/* sheet */
+.ovl{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(2,4,9,.72);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s}
+.ovl.open{opacity:1;pointer-events:auto}
+.panel{width:100%;max-width:860px;max-height:92vh;overflow-y:auto;background:linear-gradient(180deg,#0f1930,#091020);border-radius:30px 30px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -10px 60px rgba(46,168,255,.18),0 0 0 1px var(--line);transform:translateY(40px);transition:transform .35s cubic-bezier(.2,.9,.2,1)}
+.ovl.open .panel{transform:none}
+@media(min-width:760px){.ovl{align-items:center}.panel{border-radius:30px;padding:26px}}
+.grab{width:44px;height:4px;border-radius:4px;background:#2a3a5e;margin:-6px auto 14px}
+@media(min-width:760px){.grab{display:none}}
+.sh{display:flex;gap:16px}
+.sh img{width:120px;aspect-ratio:2/3;object-fit:cover;border-radius:18px;flex:none;box-shadow:0 12px 30px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+@media(min-width:760px){.sh img{width:200px}}
+.sh h2{font-size:24px;line-height:1.1}
+.sh .alt{color:var(--muted);font-size:13px;margin:2px 0 6px}
+.facts{color:#b6c6e6;font-size:14px;margin:6px 0}
+.syn{color:#cbd8f1;margin:12px 0 4px}
+.lab{font-family:var(--display);font-weight:600;margin:20px 0 8px;font-size:15px;color:#cfe3ff}
+.stg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:560px){.stg{grid-template-columns:repeat(4,1fr)}}
+.sbtn{padding:12px 8px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:14px;transition:.2s}
+.sbtn.on{border-color:currentColor;box-shadow:0 0 20px -4px currentColor;background:rgba(255,255,255,.04);font-weight:600}
+.stars{display:flex;gap:2px;flex-wrap:nowrap}
+.stars button{font-size:25px;line-height:1;color:#2a3a5e;padding:4px 1px;transition:.15s}
+.stars button.on{color:#ffd35c;text-shadow:0 0 12px rgba(255,211,92,.6)}
+@media(max-width:380px){.stars button{font-size:22px}}
+.rnum{font-family:var(--display);color:#ffd35c;margin-left:8px;font-size:18px;align-self:center}
+.prog{display:flex;align-items:center;gap:10px}
+.prog input[type=range]{flex:1;accent-color:var(--neon);height:28px}
+.step{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:20px}
+.ptxt{min-width:92px;text-align:right;font-family:var(--display)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.xbtn{position:absolute;right:14px;top:14px}
+.panel{position:relative}
+.dlg{max-width:520px}
+.dlg textarea{width:100%;min-height:150px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;resize:vertical;outline:0;font-size:13px}
+.dlg textarea:focus{border-color:var(--neon)}
+
+/* profile */
+.pf{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.pf .av{width:62px;height:62px;font-size:26px}
+.pf input{background:none;border:0;border-bottom:1px dashed var(--line);font-family:var(--display);font-size:22px;font-weight:600;width:100%;max-width:240px;outline:0;padding:2px 0}
+.pf input:focus{border-color:var(--neon)}
+.pf small{color:var(--neon2)}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{background:linear-gradient(160deg,var(--card2),var(--card));border-radius:22px;padding:16px;box-shadow:0 0 0 1px var(--line)}
+.tile b{display:block;font-family:var(--display);font-size:30px;line-height:1.1}
+.tile span{color:var(--muted);font-size:13px}
+.two{display:grid;gap:12px;margin-top:12px}
+@media(min-width:760px){.two{grid-template-columns:1fr 1fr}}
+.box{background:linear-gradient(160deg,var(--card2),var(--card));border-radius:24px;padding:18px;box-shadow:0 0 0 1px var(--line)}
+.box h3{font-size:16px;margin-bottom:12px}
+.ringw{display:flex;align-items:center;gap:18px}
+.ring{position:relative;width:128px;height:128px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring div{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:26px;font-weight:700}
+.favbox{display:flex;gap:14px;align-items:center}
+.favbox img{width:74px;aspect-ratio:2/3;object-fit:cover;border-radius:14px;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13.5px}
+.bar .n{width:110px;flex:none;color:#c3d1ee}
+.bar .t{flex:1;height:9px;border-radius:9px;background:#0a1224;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:9px;transition:width .6s cubic-bezier(.2,.9,.2,1)}
+.bar .v{width:28px;text-align:right;color:var(--muted)}
+.note{color:var(--muted);font-size:13px;margin:6px 0 12px}
+.row2{display:flex;gap:8px;flex-wrap:wrap}
+
+/* adicionar */
+.form{display:grid;gap:22px}
+@media(min-width:760px){.form{grid-template-columns:240px 1fr;align-items:start}}
+.fcol{max-width:220px;margin:0 auto;width:100%}
+@media(min-width:760px){.fcol{max-width:none;margin:0}}
+.cvprev{aspect-ratio:2/3;border-radius:24px;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+.cvprev img{width:100%;height:100%;object-fit:cover;display:block}
+.fl{display:block;color:#cfe3ff;font-weight:500;font-size:14px;margin-bottom:14px}
+.fi{display:block;width:100%;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;outline:0;transition:.2s}
+.fi:focus{border-color:var(--neon);box-shadow:var(--glow)}
+textarea.fi{resize:vertical;min-height:84px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wrapc{flex-wrap:wrap;overflow:visible;margin-bottom:12px;padding-top:2px}
+.fab{width:54px;height:54px;border-radius:50%;margin:-24px auto 0;font-size:34px;line-height:1;font-weight:300;color:#fff;background:linear-gradient(135deg,var(--neon),#5a78ff);box-shadow:0 0 0 5px rgba(10,16,32,.92),0 10px 28px rgba(46,168,255,.55);transition:transform .3s,background .3s}
+.fab.on{transform:rotate(45deg);background:linear-gradient(135deg,var(--neon2),var(--neon))}
+@media(max-width:420px){.tab{font-size:10px}.pill{padding:6px 4px}}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:#0f1a33;border-radius:14px;padding:11px 16px;box-shadow:0 0 0 1px var(--neon),0 12px 30px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:.3s;z-index:80;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+/* login */
+#auth{position:fixed;inset:0;z-index:90;display:none;overflow-y:auto;background:var(--bg);
+  background-image:radial-gradient(900px 520px at 10% -10%,rgba(46,168,255,.24),transparent 60%),radial-gradient(700px 500px at 100% 100%,rgba(0,229,255,.12),transparent 60%);
+  padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(28px + env(safe-area-inset-bottom,0px))}
+#auth.open{display:block;animation:fade .3s ease both}
+.aw{max-width:420px;margin:0 auto}
+.alogo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:24px;margin:8px 0 28px}
+.alogo svg{filter:drop-shadow(0 0 10px rgba(46,168,255,.9))}
+.aw h1{font-size:30px;margin-bottom:6px}
+.aw .seg{display:flex;margin:14px 0 8px}
+.aw .seg button{flex:1;padding:10px}
+.aerr{min-height:22px;margin:4px 2px 10px;color:#ff8fa5;font-size:14px}
+.aerr.ok{color:#3dffa5}
+.anote{background:rgba(255,200,87,.1);border:1px solid rgba(255,200,87,.35);color:#ffd98a;border-radius:14px;padding:10px 12px;font-size:13.5px;margin:10px 0}
+.wide{width:100%}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.link{color:var(--neon2);font-weight:500;padding:6px 2px;font-size:14px}
+.link.center{display:block;margin:8px auto 0;text-align:center}
+.link.dim{color:var(--muted);font-size:13px}
+.pw{position:relative}
+.pw .fi{padding-right:48px}
+.pw button{position:absolute;right:4px;top:6px;padding:9px;color:var(--muted)}
+.sw{text-align:center;color:var(--muted);margin:18px 0 0}
+.splash{display:grid;place-items:center;min-height:80vh;text-align:center;color:var(--muted)}
+.spin{width:38px;height:38px;border-radius:50%;border:3px solid rgba(46,168,255,.2);border-top-color:var(--neon);animation:sp 1s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#auth.busy .btn{opacity:.55;pointer-events:none}
+#dlgo{z-index:100}
+#toast{z-index:120}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="logo">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14L16 30 4 23V9z" fill="#0a1226" stroke="#2ea8ff" stroke-width="1.8"/><path d="M16 9v7m0 0 6 3.5M16 16l-6 3.5" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <b>OtakuVault</b>
+  </div>
+  <button class="av" id="hav" data-a="tab" data-v="profile" aria-label="Abrir perfil">O</button>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="dock" aria-label="Navegação principal"><div class="pill" id="tabs"></div></nav>
+<div id="auth" role="dialog" aria-modal="true" aria-label="Entrar no OtakuVault"></div>
+<div class="ovl" id="sheet" role="dialog" aria-modal="true"><div class="panel" id="panel"></div></div>
+<div class="ovl" id="dlgo" role="dialog" aria-modal="true"><div class="panel dlg" id="dlg"></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   FIREBASE: cole aqui a configuração do seu projeto.
+   Console do Firebase > Configurações do projeto > Seus apps > Web.
+   Deixe os campos vazios para usar o app sem login.
+   ============================================================ */
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyAe083vPlKmMC09td9hat-4SL204cU4alA",
+  authDomain:"otakuvault-2acee.firebaseapp.com",
+  projectId:"otakuvault-2acee",
+  storageBucket:"otakuvault-2acee.firebasestorage.app",
+  messagingSenderId:"360251606246",
+  appId:"1:360251606246:web:5148eba2c7a07c9dcda727"
+};
+
+/* ---------- DADOS: título|eps|ano|gêneros|matiz|tipo(F famoso / G joia)|sinopse|nome alternativo ---------- */
+const RAW=[
+"Naruto|220|2002|Ação,Aventura|28|F|Um jovem ninja rejeitado sonha em virar Hokage e ser reconhecido por todos.|Naruto Clássico",
+"Naruto Shippuden|500|2007|Ação,Aventura|22|F|Naruto volta mais forte para enfrentar a Akatsuki e proteger quem ama.|",
+"One Piece|1100|1999|Aventura,Ação,Comédia|205|F|Luffy e seu bando navegam atrás do tesouro supremo para ser o Rei dos Piratas.|",
+"Dragon Ball Z|291|1989|Ação,Aventura|38|F|Goku e os Guerreiros Z defendem a Terra de saiyajins, androides e vilões cósmicos.|DBZ",
+"Dragon Ball Super|131|2015|Ação,Comédia|280|F|Goku enfrenta deuses da destruição e torneios entre universos.|DBS",
+"Attack on Titan|94|2013|Ação,Drama,Suspense|15|F|A humanidade vive atrás de muralhas, ameaçada por titãs devoradores de gente.|Shingeki no Kyojin",
+"Demon Slayer|63|2019|Ação,Sobrenatural|165|F|Tanjiro vira caçador de onis para curar a irmã transformada em demônio.|Kimetsu no Yaiba",
+"Jujutsu Kaisen|47|2020|Ação,Sobrenatural|255|F|Yuji engole um dedo amaldiçoado e entra no mundo dos feiticeiros.|JJK",
+"Solo Leveling|25|2024|Ação,Fantasia|235|F|O caçador mais fraco do mundo ganha um poder único para subir de nível sozinho.|Ore dake Level Up na Ken",
+"Blue Lock|38|2022|Esporte,Drama|215|F|Um programa extremo busca criar o atacante mais egoísta e letal do Japão.|",
+"Tokyo Revengers|49|2021|Ação,Drama,Sobrenatural|345|F|Takemichi viaja no tempo para salvar a ex-namorada e mudar o futuro.|",
+"Death Note|37|2006|Suspense,Psicológico,Sobrenatural|350|F|Um estudante encontra um caderno que mata quem tiver o nome escrito nele.|",
+"Bleach|366|2004|Ação,Sobrenatural|195|F|Ichigo se torna ceifador de almas e luta contra espíritos e Hollows.|",
+"Hunter x Hunter|148|2011|Aventura,Ação,Fantasia|130|F|Gon parte para ser Hunter e encontrar o pai, enfrentando desafios incríveis.|HxH",
+"My Hero Academia|159|2016|Ação,Aventura|140|F|Num mundo de superpoderes, Izuku nasce sem nenhum e herda o dom do maior herói.|Boku no Hero Academia",
+"Chainsaw Man|12|2022|Ação,Terror,Sobrenatural|8|F|Denji se funde com seu demônio de motosserra e vira caçador de demônios.|",
+"Spy x Family|37|2022|Comédia,Ação,Slice of Life|335|F|Um espião, uma assassina e uma telepata fingem ser uma família comum.|",
+"Fullmetal Alchemist: Brotherhood|64|2009|Aventura,Fantasia,Drama|35|F|Dois irmãos alquimistas buscam a Pedra Filosofal para recuperar o que perderam.|FMAB",
+"One Punch Man|24|2015|Ação,Comédia|50|F|Saitama derrota qualquer inimigo com um soco e sofre com o tédio de ser invencível.|",
+"Cowboy Bebop|26|1998|Sci-Fi,Ação|20|F|Caçadores de recompensas viajam pelo espaço fugindo de seus passados.|",
+"Steins;Gate|24|2011|Sci-Fi,Suspense|180|F|Um grupo descobre como enviar mensagens ao passado e muda a história sem querer.|",
+"Code Geass|50|2006|Mecha,Suspense,Ação|275|F|Lelouch recebe o poder de ser obedecido e declara guerra ao império que o exilou.|",
+"Neon Genesis Evangelion|26|1995|Mecha,Psicológico,Sci-Fi|285|F|Adolescentes pilotam robôs gigantes contra anjos enquanto lidam com seus traumas.|",
+"Sword Art Online|25|2012|Aventura,Fantasia,Romance|195|F|Jogadores presos num MMORPG de realidade virtual precisam vencer o jogo para sair.|SAO",
+"Tokyo Ghoul|12|2014|Terror,Ação,Sobrenatural|0|F|Kaneki vira meio-ghoul e precisa viver entre humanos e monstros devoradores.|",
+"Haikyu!!|85|2014|Esporte,Comédia,Drama|25|F|Um baixinho apaixonado por vôlei sonha em ser o maior \"pequeno gigante\" da quadra.|",
+"Vinland Saga|48|2019|Ação,Histórico,Drama|45|F|Thorfinn busca vingança entre vikings e descobre o que é ser um verdadeiro guerreiro.|",
+"Mob Psycho 100|37|2016|Ação,Comédia,Sobrenatural|270|F|Um garoto com poderes psíquicos enormes tenta viver uma vida normal.|",
+"Black Clover|170|2017|Ação,Fantasia|75|F|Asta nasce sem magia num mundo mágico e sonha em ser o Rei Mago.|",
+"Fire Force|48|2019|Ação,Sobrenatural|12|F|Bombeiros com poderes de fogo enfrentam humanos que viram infernais.|Enen no Shouboutai",
+"Re:Zero|66|2016|Fantasia,Drama,Suspense|250|F|Subaru volta no tempo toda vez que morre num mundo de fantasia.|",
+"KonoSuba|20|2016|Comédia,Fantasia,Aventura|55|F|Um jovem reencarna num mundo de RPG com um grupo desastrado de aventureiros.|",
+"Your Name|1|2016|Romance,Drama,Sobrenatural|215|F|Dois adolescentes trocam de corpo e tentam se encontrar através do tempo e da distância.|Kimi no Na wa",
+"Violet Evergarden|13|2018|Drama,Fantasia|210|F|Uma ex-soldado aprende o sentido das palavras e do amor escrevendo cartas.|",
+"Dandadan|12|2024|Ação,Comédia,Sobrenatural|320|F|Uma garota que acredita em fantasmas e um garoto que acredita em aliens se unem contra o sobrenatural.|",
+"Frieren|28|2023|Fantasia,Aventura,Drama|195|F|Uma maga elfa revisita o mundo após derrotar o Rei Demônio para entender seus antigos companheiros.|Sousou no Frieren",
+"Kaguya-sama: Love is War|37|2019|Comédia,Romance|345|F|Dois gênios do conselho estudantil travam batalhas mentais para o outro se declarar primeiro.|",
+"Bocchi the Rock!|12|2022|Música,Comédia,Slice of Life|330|F|Uma garota extremamente tímida encontra amigas e uma banda de rock.|",
+"Oshi no Ko|24|2023|Drama,Mistério,Música|305|F|Um médico reencarna como filho de uma ídolo e mergulha nos bastidores do showbiz.|",
+"Kaiju No. 8|12|2024|Ação,Sci-Fi|205|F|Um faxineiro de monstros ganha o poder de virar kaiju e entra na força de defesa.|Kaijuu 8-gou",
+"Lycoris Recoil|13|2022|Ação,Slice of Life|355|F|Duas jovens agentes secretas trabalham num café enquanto enfrentam crimes em Tóquio.|",
+"Cyberpunk: Edgerunners|10|2022|Sci-Fi,Ação,Drama|175|F|Um garoto de Night City vira mercenário cibernético em busca de um lugar no mundo.|",
+"Hell's Paradise|13|2023|Ação,Fantasia,Sobrenatural|150|F|Um ninja condenado precisa explorar uma ilha misteriosa em troca da liberdade.|Jigokuraku",
+"Made in Abyss|25|2017|Aventura,Fantasia,Drama|40|G|Uma garota e um robô descem ao Abismo, um poço cheio de maravilhas e perigos.|",
+"Monster|74|2004|Suspense,Psicológico,Mistério|90|G|Um neurocirurgião persegue o paciente que salvou e que virou um assassino.|",
+"Gintama|367|2006|Comédia,Ação|220|G|Samurais caóticos fazem bicos num Japão invadido por aliens, entre piadas e batalhas épicas.|",
+"Trigun|26|1998|Ação,Sci-Fi|40|G|Vash, o pacifista mais procurado do deserto, foge de caçadores de recompensa.|",
+"Samurai Champloo|26|2004|Ação,Aventura,Histórico|35|G|Uma garçonete e dois espadachins rivais cruzam o Japão feudal ao som de hip-hop.|",
+"Black Lagoon|24|2006|Ação|25|G|Um assalariado vira pirata do mar e se envolve com mercenários numa cidade sem lei.|",
+"Erased|12|2016|Mistério,Suspense,Drama|205|G|Satoru volta ao passado para impedir uma série de desaparecimentos de crianças.|Boku dake ga Inai Machi",
+"Classroom of the Elite|12|2017|Psicológico,Drama|200|G|Numa escola onde mérito é tudo, um aluno discreto esconde sua verdadeira capacidade.|Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e",
+"Overlord|13|2015|Fantasia,Ação|270|G|Um jogador fica preso no seu RPG favorito, agora como lorde de um império de mortos-vivos.|",
+"Gurren Lagann|27|2007|Mecha,Ação,Aventura|20|G|Dois amigos perfuram o céu com um robô movido a espírito de luta.|Tengen Toppa Gurren Lagann",
+"Great Teacher Onizuka|43|1999|Comédia,Drama,Slice of Life|30|G|Um ex-gangster vira professor e transforma classes problemáticas à sua maneira.|GTO",
+"Hyouka|22|2012|Mistério,Slice of Life|150|G|Um garoto sem energia é arrastado a resolver mistérios do clube de literatura clássica.|",
+"Spice and Wolf|26|2008|Fantasia,Romance,Aventura|30|G|Um mercador viaja com uma deusa lobo e negocia nos mercados de um mundo medieval.|Ookami to Koushinryou",
+"Yuri on Ice|12|2016|Esporte,Romance|195|G|Um patinador em crise reencontra seu ídolo, que se torna seu treinador.|Yuri!!! on Ice",
+"Devilman Crybaby|10|2018|Terror,Ação,Sobrenatural|235|G|Akira se funde com um demônio para lutar por humanidade num mundo em colapso.|",
+"Sound! Euphonium|13|2015|Música,Drama|210|G|Uma banda escolar de sopro busca o nacional entre ensaios intensos e rivalidades.|Hibike! Euphonium",
+"Mushishi|26|2005|Sobrenatural,Slice of Life,Mistério|140|G|Um andarilho estuda criaturas ancestrais que afetam a vida de vilarejos remotos.|",
+"Pluto|8|2023|Sci-Fi,Mistério|215|G|Um detetive robô investiga assassinatos que ameaçam os maiores robôs do mundo.|",
+"Land of the Lustrous|12|2017|Fantasia,Drama|170|G|Seres de pedras preciosas combatem inimigos que querem transformá-los em ornamentos.|Houseki no Kuni",
+"Odd Taxi|13|2021|Mistério,Suspense|45|G|Um taxista rabugento é puxado para o desaparecimento de uma jovem em Tóquio.|",
+"Ping Pong the Animation|11|2014|Esporte,Drama|20|G|Dois amigos de infância vivem a pressão do tênis de mesa colegial.|",
+"Planetes|26|1999|Sci-Fi,Drama|225|G|Coletores de lixo espacial sonham com viagens além da órbita da Terra.|",
+"Ergo Proxy|23|2006|Sci-Fi,Psicológico|290|G|Numa cidade futurista, uma investigadora cruza com um ser que desafia a existência humana.|",
+"Terror in Resonance|11|2014|Suspense,Psicológico|200|G|Dois jovens ameaçam Tóquio com ataques e enigmas enquanto a polícia corre atrás.|Zankyou no Terror",
+"Welcome to the NHK|24|2006|Comédia,Drama,Psicológico|80|G|Um hikikomori tenta sair do isolamento com a ajuda de uma garota misteriosa.|",
+"Ranking of Kings|23|2021|Aventura,Fantasia,Drama|45|G|Um príncipe surdo e frágil quer provar que pode ser rei.|Ousama Ranking",
+"Dorohedoro|12|2020|Ação,Terror,Fantasia|25|G|Um homem com cabeça de lagarto busca sua identidade no mundo dos magos.|",
+"The Apothecary Diaries|24|2023|Mistério,Drama,Histórico|350|G|Uma serva com conhecimento de ervas resolve enigmas na corte imperial.|Kusuriya no Hitorigoto",
+"91 Days|12|2016|Drama,Histórico,Suspense|15|G|Um rapaz volta à Lei Seca americana para vingar sua família entre a máfia.|",
+"Paranoia Agent|13|2004|Psicológico,Mistério|280|G|Um garoto de patins que ataca pessoas revela a paranoia coletiva de uma cidade.|",
+"Kaiba|12|2008|Sci-Fi,Aventura,Drama|160|G|Num mundo onde memórias podem ser armazenadas, um homem tenta recuperar a sua.|",
+"Golden Kamuy|12|2018|Aventura,Histórico,Ação|195|G|Um veterano e uma garota ainu caçam um tesouro em Hokkaido.|",
+"Sonny Boy|12|2021|Sci-Fi,Psicológico|180|G|Alunos são arrastados para uma dimensão de vazio e ganham habilidades estranhas.|",
+"Look Back|1|2024|Drama,Slice of Life|135|G|Duas jovens desenhistas de mangá constroem uma amizade pela paixão de desenhar.|",
+"March Comes in Like a Lion|44|2016|Drama,Slice of Life|210|G|Um jovem prodígio do shogi lida com a solidão e encontra uma família improvisada.|3-gatsu no Lion",
+"Girls' Last Tour|12|2017|Slice of Life,Sci-Fi|55|G|Duas garotas vagam de moto por uma cidade pós-apocalíptica.|Shoujo Shuumatsu Ryokou",
+"Space Brothers|99|2012|Slice of Life,Drama,Sci-Fi|215|G|Dois irmãos perseguem o sonho de virar astronautas.|Uchuu Kyoudai",
+"Barakamon|12|2014|Comédia,Slice of Life|120|G|Um calígrafo exilado numa ilha rural reencontra a inspiração com os moradores.|",
+"Wolf's Rain|26|2003|Fantasia,Aventura,Drama|210|G|Lobos disfarçados de humanos procuram o paraíso num mundo gelado.|",
+"Mononoke|12|2007|Terror,Mistério,Sobrenatural|340|G|Um vendedor de remédios exorciza espíritos num visual de estampas japonesas.|",
+"The Tatami Galaxy|11|2010|Comédia,Psicológico,Romance|130|G|Um universitário revive a vida em universos diferentes tentando ser feliz.|Yojouhan Shinwa Taikei",
+"Kids on the Slope|12|2012|Música,Romance,Drama|30|G|Jazz, amizades e romances adolescentes no Japão dos anos 60.|Sakamichi no Apollon",
+"Delicious in Dungeon|24|2024|Fantasia,Aventura,Comédia|25|G|Aventureiros cozinham monstros para sobreviver nas profundezas de um calabouço.|Dungeon Meshi",
+"Heavenly Delusion|13|2023|Sci-Fi,Mistério|150|G|Num futuro devastado, dois grupos procuram um \"paraíso\" e uma verdade escondida.|Tengoku Daimakyou",
+"Zom 100|12|2023|Comédia,Terror,Ação|50|G|Num apocalipse zumbi, um funcionário explorado finalmente se sente livre e faz uma lista de desejos.|Zom 100: Bucket List of the Dead",
+"Run with the Wind|23|2018|Esporte,Drama|180|G|Um grupo improvável de universitários sonha em correr a maratona de revezamento de Hakone.|Kaze ga Tsuyoku Fuiteiru",
+"Orb: On the Movements of the Earth|25|2024|Histórico,Drama|215|G|Na Europa medieval, jovens arriscam a vida para defender a ideia de que a Terra se move.|Chi. Chikyuu no Undou ni Tsuite",
+"Chihayafuru|25|2011|Esporte,Drama,Romance|330|G|Uma garota leva o karuta competitivo a sério e reúne amigos para o campeonato.|"
+];
+const ANIMES=RAW.map((r,i)=>{const p=r.split('|');return{id:i+1,t:p[0],eps:+p[1],y:+p[2],g:p[3].split(','),h:+p[4],tag:p[5],s:p[6],alt:p[7]||''}});
+const byId={};ANIMES.forEach(a=>byId[a.id]=a);
+const yr=a=>a.y||'—';
+function hue(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h}
+
+const STATUS={
+  watched:{l:'Assistido',e:'✅',c:'#3dffa5'},
+  watching:{l:'Assistindo',e:'👀',c:'#2ea8ff'},
+  paused:{l:'Pausado',e:'⏸️',c:'#ffc857'},
+  planned:{l:'Quero assistir',e:'📌',c:'#b48cff'}
+};
+const ORDER=['watched','watching','paused','planned'];
+const TABS=[['home','🏠','Início'],['explore','🔍','Explorar'],['add','＋','Adicionar'],['list','📚','Minha Lista'],['favs','⭐','Favoritos'],['profile','👤','Perfil']];
+
+/* ---------- utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ---------- estado salvo (localStorage) ---------- */
+const KEY='otakuvault.v1', FBKEY='otakuvault.fbcfg', GUEST='otakuvault.guest';
+let U=null,syncOn=false,pushT=null;
+let S={name:'',items:{},custom:[],nid:1000};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o==='object')applyState(o)}}catch(e){}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Sem espaço para salvar. Tente remover capas personalizadas.')}
+  if(U&&syncOn)schedulePush();
+}
+function applyState(o){
+  for(let i=ANIMES.length-1;i>=0;i--)if(ANIMES[i].custom){delete byId[ANIMES[i].id];ANIMES.splice(i,1)}
+  S={name:o.name||'',items:o.items||{},custom:Array.isArray(o.custom)?o.custom:[],nid:o.nid||1000};
+  S.custom.forEach(c=>{if(c&&c.id&&!byId[c.id]){ANIMES.push(c);byId[c.id]=c}});
+  S.nid=Math.max(S.nid,...S.custom.map(c=>c.id),1000);
+  save();
+}
+const it=id=>S.items[id]||{};
+let nudged=false;
+function upd(id,patch){
+  if(!nudged&&!U&&isGuest()&&getCfg()){nudged=true;setTimeout(()=>toast('Para não perder seus animes, crie uma conta no Perfil.'),2400)}
+  const cur=Object.assign({},S.items[id]||{},patch,{u:Date.now()});
+  if(!cur.st&&!cur.f&&!cur.r&&!cur.p&&!cur.c)delete S.items[id];else S.items[id]=cur;
+  save();
+}
+function setStatus(id,st){
+  const a=byId[id],i=it(id);
+  if(i.st===st){upd(id,{st:''});return}
+  const patch={st};
+  if(st==='watched')patch.p=a.eps;
+  if(st==='planned')patch.p=0;
+  upd(id,patch);
+}
+function setRate(id,n){if(it(id).r===n)n=0;upd(id,{r:n})}
+function setProg(id,p){
+  const a=byId[id],i=it(id);p=Math.max(0,Math.min(a.eps,p|0));
+  const patch={p};
+  if(p>=a.eps)patch.st='watched';
+  else if(p>0&&(!i.st||i.st==='planned'||i.st==='watched'))patch.st='watching';
+  upd(id,patch);
+}
+const prog=id=>{const i=it(id);return i.st==='watched'&&i.p==null?byId[id].eps:(i.p||0)};
+
+/* ---------- capas geradas (SVG) ---------- */
+const covers={};
+function wrapT(t,max){
+  const words=t.split(' '),lines=[];let cur='';
+  words.forEach(w=>{
+    while(w.length>max){if(cur){lines.push(cur);cur=''}lines.push(w.slice(0,max));w=w.slice(max)}
+    if((cur+' '+w).trim().length>max){lines.push(cur);cur=w}else cur=(cur+' '+w).trim();
+  });
+  if(cur)lines.push(cur);
+  return lines;
+}
+function mkCover(a){
+  const h=a.h,id=a.id,m=id%5,W=300,H=450;
+  const R=n=>((id*9301+n*49297)%233280)/233280;
+  const c1=`hsl(${h},88%,44%)`,c2=`hsl(${(h+45)%360},80%,12%)`,c3=`hsl(${(h+330)%360},100%,68%)`;
+  let d='';
+  if(m===0){for(let k=0;k<6;k++){const x=-60+k*62+R(k)*26;d+=`<polygon points="${x},0 ${x+30},0 ${x-110},${H} ${x-140},${H}" fill="${c3}" opacity="${(.07+k*.025).toFixed(2)}"/>`}d+=`<circle cx="215" cy="120" r="46" fill="${c3}" opacity=".5"/>`}
+  else if(m===1){for(let r=40;r<260;r+=34)d+=`<circle cx="210" cy="130" r="${r}" fill="none" stroke="${c3}" stroke-width="2" opacity="${(.34-r/900).toFixed(2)}"/>`;d+=`<circle cx="210" cy="130" r="34" fill="${c3}" opacity=".55"/>`}
+  else if(m===2){for(let k=0;k<16;k++){const ang=Math.PI*(1+k/15);d+=`<line x1="150" y1="330" x2="${150+520*Math.cos(ang)}" y2="${330+520*Math.sin(ang)}" stroke="${c3}" stroke-width="${6+R(k)*12}" opacity="${(.08+R(k+3)*.12).toFixed(2)}"/>`}d+=`<circle cx="150" cy="300" r="52" fill="${c3}" opacity=".55"/>`}
+  else if(m===3){for(let y=0;y<9;y++)for(let x=0;x<6;x++)d+=`<circle cx="${28+x*48}" cy="${34+y*30}" r="${(1.5+R(x*9+y)*3).toFixed(1)}" fill="${c3}" opacity=".35"/>`;d+=`<circle cx="95" cy="150" r="64" fill="${c3}" opacity=".4"/>`}
+  else{d+=`<circle cx="150" cy="170" r="108" fill="none" stroke="${c3}" stroke-width="14" opacity=".4"/>`;for(let y=40;y<H;y+=44)d+=`<rect x="0" y="${y}" width="${W}" height="14" fill="${c3}" opacity=".06"/>`;d+=`<circle cx="150" cy="170" r="40" fill="${c3}" opacity=".5"/>`}
+  const long=a.t.length>26;
+  const size=long?23:(a.t.length>14?29:34),max=Math.floor(262/(size*.6));
+  const lines=wrapT(a.t,max).slice(0,4),lh=size*1.12;
+  let y0=H-34-(lines.length-1)*lh;
+  const txt=lines.map((l,i)=>`<text x="22" y="${(y0+i*lh).toFixed(0)}" font-size="${size}" font-weight="900" fill="#fff" font-family="Arial Black,Impact,Arial,sans-serif" stroke="rgba(0,0,0,.35)" stroke-width="1">${esc(l)}</text>`).join('');
+  const mono=esc(a.t.replace(/^(The|A) /,'').charAt(0).toUpperCase());
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="g" x1="0" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></linearGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/>${d}<text x="${W/2}" y="${(H*0.64).toFixed(0)}" text-anchor="middle" font-size="270" font-weight="900" font-family="Arial Black,Impact,Arial,sans-serif" fill="#fff" opacity=".2">${mono}</text><rect width="${W}" height="${H}" fill="url(#b)"/><text x="22" y="34" font-size="13" font-weight="700" fill="#fff" opacity=".8" font-family="Arial,sans-serif" letter-spacing="2">${a.y||''}</text><rect x="22" y="42" width="34" height="3" fill="${c3}"/></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function cover(a){const c=it(a.id).c;if(c)return c;return covers[a.id]||(covers[a.id]=mkCover(a))}
+
+/* ---------- componentes ---------- */
+function card(a){
+  const i=it(a.id),st=i.st?STATUS[i.st]:null,p=prog(a.id);
+  return `<article class="card" data-a="open" data-v="${a.id}" tabindex="0" aria-label="${esc(a.t)}">
+    <div class="cv"><img loading="lazy" src="${cover(a)}" alt="Capa de ${esc(a.t)}">
+      ${st?`<span class="st" style="color:${st.c}">${st.e} ${st.l}</span>`:''}
+      <button class="fav ${i.f?'on':''}" data-a="fav" data-v="${a.id}" aria-label="Favoritar ${esc(a.t)}" aria-pressed="${!!i.f}">${i.f?'♥':'♡'}</button>
+      <div class="ov"><h3>${esc(a.t)}</h3>
+        <div class="meta"><span>${a.eps} ep · ${yr(a)}</span><span class="rate ${i.r?'':'zero'}">★ ${i.r||0}/10</span></div>
+      </div>
+      ${i.st==='watching'&&p>0?`<div class="pbar"><i style="width:${Math.min(100,p/a.eps*100)}%"></i></div>`:''}
+    </div></article>`;
+}
+const grid=l=>l.length?`<div class="grid">${l.map(card).join('')}</div>`:'';
+const rail=(title,sub,l)=>l.length?`<section class="row"><div class="rh"><h2>${title}</h2><span>${sub||''}</span></div><div class="rail">${l.map(card).join('')}</div></section>`:'';
+function empty(ico,msg,btn){return `<div class="empty"><div class="big">${ico}</div><p>${msg}</p>${btn||''}</div>`}
+const dayN=Math.floor(Date.now()/864e5);
+function rot(arr,n){if(!arr.length)return arr;n=n%arr.length;return arr.slice(n).concat(arr.slice(0,n))}
+
+/* ---------- estado de interface ---------- */
+const UI={tab:'home',q:'',g:'Todos',type:'all',lq:'',lf:'all',sort:'recent'};
+const GENRES=(()=>{const c={};ANIMES.forEach(a=>a.g.forEach(g=>c[g]=(c[g]||0)+1));return Object.keys(c).sort((x,y)=>c[y]-c[x])})();
+
+function matches(a,q,g,type){
+  if(g&&g!=='Todos'&&!a.g.includes(g))return false;
+  if(type==='F'&&a.tag!=='F')return false;
+  if(type==='G'&&a.tag!=='G')return false;
+  if(type==='C'&&!a.custom)return false;
+  if(!q)return true;
+  const hay=norm([a.t,a.alt,a.g.join(' '),a.y||''].join(' '));
+  return norm(q).split(/\s+/).every(w=>hay.includes(w));
+}
+
+/* ---------- telas ---------- */
+function vHome(){
+  const pool=ANIMES.filter(a=>a.tag==='G'||a.tag==='F');
+  const hero=pool[(dayN*7)%pool.length];
+  const watching=ANIMES.filter(a=>it(a.id).st==='watching').sort((x,y)=>(it(y.id).u||0)-(it(x.id).u||0));
+  const planned=ANIMES.filter(a=>it(a.id).st==='planned');
+  const gems=rot(ANIMES.filter(a=>a.tag==='G'),dayN*3).slice(0,22);
+  const fam=ANIMES.filter(a=>a.tag==='F');
+  const rows=['Ação','Fantasia','Drama','Sci-Fi','Suspense','Comédia','Esporte','Romance','Psicológico'].map(g=>
+    rail(g,'',rot(ANIMES.filter(a=>a.g.includes(g)),dayN+g.length).slice(0,16))).join('');
+  return `<section class="pg">
+    <div class="hero"><div class="bgimg" style="background-image:url('${cover(hero)}')"></div><div class="in">
+      <img src="${cover(hero)}" alt="Capa de ${esc(hero.t)}">
+      <div><small>Destaque de hoje</small><h2>${esc(hero.t)}</h2>
+        <div class="tags">${hero.g.map(g=>`<span>${g}</span>`).join('')}<span>${hero.eps} ep · ${hero.y}</span></div>
+        <p>${esc(hero.s)}</p><button class="btn" data-a="open" data-v="${hero.id}">Ver detalhes</button></div>
+    </div></div>
+    ${rail('Continue assistindo','',watching)}
+    ${rail('Na fila para assistir','',planned)}
+    ${rail('Adicionados por você','',ANIMES.filter(a=>a.custom))}
+    ${rail('Os mais famosos','Clássicos e hits',fam)}
+    ${rail('Joias escondidas','Muito bons, pouco falados',gems)}
+    ${rows}
+  </section>`;
+}
+function vExplore(){
+  return `<section class="pg"><h1>Explorar</h1>
+    <label class="search"><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="Buscar por nome, gênero ou ano" value="${esc(UI.q)}" autocomplete="off"></label>
+    <div class="chips" id="gchips"></div>
+    <div class="seg" id="tseg"></div>
+    <div class="count"><span id="cnt"></span><button class="chip" data-a="rand">🎲 Surpreenda-me</button></div>
+    <div id="res"></div></section>`;
+}
+function fillExplore(){
+  $('#gchips').innerHTML=['Todos'].concat(GENRES).map(g=>`<button class="chip ${UI.g===g?'on':''}" data-a="genre" data-v="${esc(g)}">${g}</button>`).join('');
+  $('#tseg').innerHTML=[['all','Todos'],['F','Famosos'],['G','Joias escondidas'],['C','Meus']].map(x=>`<button class="${UI.type===x[0]?'on':''}" data-a="type" data-v="${x[0]}">${x[1]}</button>`).join('');
+  const l=ANIMES.filter(a=>matches(a,UI.q,UI.g,UI.type));
+  $('#cnt').textContent=`${l.length} anime${l.length===1?'':'s'}`;
+  $('#res').innerHTML=l.length?grid(l):empty('🛰️','Nada encontrado. Tente outro nome ou limpe os filtros.');
+}
+function vList(){
+  return `<section class="pg"><h1>Minha Lista</h1>
+    <label class="search"><span aria-hidden="true">🔍</span><input id="lq" type="search" placeholder="Buscar na sua lista" value="${esc(UI.lq)}" autocomplete="off"></label>
+    <div class="chips" id="lchips"></div>
+    <div class="count"><span id="lcnt"></span>
+      <select class="sort" id="sort" aria-label="Ordenar"><option value="recent">Mais recentes</option><option value="rating">Maior nota</option><option value="name">Nome (A-Z)</option><option value="year">Ano</option></select></div>
+    <div id="lres"></div></section>`;
+}
+function fillList(){
+  const mine=ANIMES.filter(a=>it(a.id).st);
+  const cnt=k=>k==='all'?mine.length:mine.filter(a=>it(a.id).st===k).length;
+  $('#lchips').innerHTML=`<button class="chip ${UI.lf==='all'?'on':''}" data-a="lf" data-v="all">Todos · ${cnt('all')}</button>`+
+    ORDER.map(k=>`<button class="chip ${UI.lf===k?'on':''}" data-a="lf" data-v="${k}">${STATUS[k].e} ${STATUS[k].l} · ${cnt(k)}</button>`).join('');
+  let l=mine.filter(a=>(UI.lf==='all'||it(a.id).st===UI.lf)&&matches(a,UI.lq,'Todos','all'));
+  const s=UI.sort;
+  l.sort((x,y)=>s==='rating'?(it(y.id).r||0)-(it(x.id).r||0):s==='name'?x.t.localeCompare(y.t):s==='year'?y.y-x.y:(it(y.id).u||0)-(it(x.id).u||0));
+  $('#lcnt').textContent=`${l.length} anime${l.length===1?'':'s'}`;
+  $('#sort').value=UI.sort;
+  $('#lres').innerHTML=l.length?grid(l):(mine.length?empty('🔎','Nenhum anime com esse filtro.'):empty('📚','Sua lista está vazia. Abra qualquer anime e escolha um status para ele aparecer aqui.',`<button class="btn" data-a="tab" data-v="explore">Explorar animes</button>`));
+}
+function vFavs(){
+  const l=ANIMES.filter(a=>it(a.id).f).sort((x,y)=>(it(y.id).u||0)-(it(x.id).u||0));
+  return `<section class="pg"><h1>Favoritos</h1><p class="sub">${l.length} anime${l.length===1?'':'s'} que você ama</p>
+    ${l.length?grid(l):empty('⭐','Toque no ♡ em qualquer card para guardar seus favoritos aqui.',`<button class="btn" data-a="tab" data-v="explore">Explorar animes</button>`)}</section>`;
+}
+function stats(){
+  const all=Object.keys(S.items).map(id=>({a:byId[id],v:S.items[id]})).filter(x=>x.a);
+  const watched=all.filter(x=>x.v.st==='watched');
+  const rated=all.filter(x=>x.v.r>0);
+  const avg=rated.length?rated.reduce((s,x)=>s+x.v.r,0)/rated.length:0;
+  const favs=all.filter(x=>x.v.f);
+  const pickFrom=favs.length?favs:rated;
+  const top=pickFrom.slice().sort((x,y)=>(y.v.r||0)-(x.v.r||0)||(y.v.u||0)-(x.v.u||0))[0];
+  const eps=all.reduce((s,x)=>s+(x.v.st==='watched'&&x.v.p==null?x.a.eps:(x.v.p||0)),0);
+  const by={};ORDER.forEach(k=>by[k]=all.filter(x=>x.v.st===k).length);
+  return{watched:watched.length,avg,top,eps,by,rated:rated.length,favs:favs.length};
+}
+function rank(n){return n>=60?'Lendário':n>=30?'Mestre':n>=15?'Veterano':n>=5?'Explorador':'Novato'}
+function vProfile(){
+  const s=stats(),total=ANIMES.length,pct=Math.round(s.watched/total*100),C=2*Math.PI*54;
+  const name=S.name||'Otaku';
+  const maxBar=Math.max(1,...ORDER.map(k=>s.by[k]));
+  return `<section class="pg"><h1>Perfil</h1>
+    <div class="pf"><div class="av">${esc(name.charAt(0).toUpperCase())}</div>
+      <div><input id="uname" maxlength="24" value="${esc(S.name)}" placeholder="Seu nome" aria-label="Seu nome"><br><small>Nível: ${rank(s.watched)}</small></div></div>
+    <div class="tiles">
+      <div class="tile"><b>${s.watched}</b><span>Animes assistidos</span></div>
+      <div class="tile"><b>${s.rated?s.avg.toFixed(1):'—'}</b><span>Nota média${s.rated?` · ${s.rated} avaliado${s.rated>1?'s':''}`:''}</span></div>
+      <div class="tile"><b>${s.eps}</b><span>Episódios vistos</span></div>
+      <div class="tile"><b>${Math.round(s.eps*24/60)}h</b><span>Tempo estimado (24 min/ep)</span></div>
+    </div>
+    <div class="two">
+      <div class="box"><h3>Progresso da coleção</h3><div class="ringw">
+        <div class="ring"><svg width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="54" fill="none" stroke="#0a1224" stroke-width="12"/><circle cx="64" cy="64" r="54" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-s.watched/total)).toFixed(1)}" style="filter:drop-shadow(0 0 6px #2ea8ff)"/><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2ea8ff"/><stop offset="1" stop-color="#00e5ff"/></linearGradient></defs></svg><div>${pct}%</div></div>
+        <div><b style="font-family:var(--display);font-size:18px">${s.watched} de ${total}</b><div class="note">animes da sua coleção já assistidos</div></div></div></div>
+      <div class="box"><h3>Anime favorito</h3>${s.top?`<div class="favbox"><img src="${cover(s.top.a)}" alt="" data-a="open" data-v="${s.top.a.id}"><div><b style="font-family:var(--display);font-size:18px">${esc(s.top.a.t)}</b><div class="note">${s.top.v.r?`Sua nota: ★ ${s.top.v.r}/10`:'Ainda sem nota'}</div></div></div>`:`<div class="note">Marque um anime com ♡ ou dê uma nota para ele aparecer aqui.</div>`}</div>
+    </div>
+    <div class="box" style="margin-top:12px"><h3>Sua lista por status</h3>
+      ${ORDER.map(k=>`<div class="bar"><span class="n">${STATUS[k].e} ${STATUS[k].l}</span><span class="t"><i style="width:${s.by[k]/maxBar*100}%;background:${STATUS[k].c}"></i></span><span class="v">${s.by[k]}</span></div>`).join('')}</div>
+    <div class="two">
+      <div class="box"><h3>Conta e nuvem</h3>${cloudBox()}</div>
+      <div class="box"><h3>Backup</h3><div class="note">Seus dados ficam salvos neste aparelho. Exporte para guardar uma cópia ou trocar de aparelho.</div>
+        <div class="row2"><button class="btn ghost" data-a="export">Exportar</button><button class="btn ghost" data-a="import">Importar</button><button class="btn danger" data-a="reset">Apagar tudo</button></div></div>
+    </div></section>`;
+}
+function cloudText(){return getCfg()?'Entre ou crie uma conta para salvar e restaurar sua coleção na nuvem.':'Firebase ainda não configurado. Cole a configuração do seu projeto para ativar login e sincronização.'}
+
+/* ---------- adicionar / editar anime ---------- */
+const blankForm=()=>({t:'',eps:'',y:'',g:[],s:'',st:'planned',c:''});
+UI.form=blankForm();UI.edit=null;
+const DEFSYN='Anime adicionado por você.';
+function vAdd(){
+  const f=UI.form,ed=UI.edit;
+  return `<section class="pg"><h1>${ed?'Editar anime':'Adicionar anime'}</h1>
+   <p class="sub">${ed?'Atualize os dados do seu anime.':'Não achou no catálogo? Cadastre aqui e ele entra na sua lista.'}</p>
+   <div class="form">
+    <div class="fcol" id="fcov"></div>
+    <div class="fmain">
+     <label class="fl">Nome do anime *<input class="fi" id="f_t" maxlength="80" placeholder="Ex.: Mob Psycho 100" value="${esc(f.t)}" autocomplete="off"></label>
+     <div class="frow">
+      <label class="fl">Episódios *<input class="fi" id="f_eps" type="number" inputmode="numeric" min="1" max="5000" placeholder="12" value="${esc(f.eps)}"></label>
+      <label class="fl">Ano<input class="fi" id="f_y" type="number" inputmode="numeric" min="1900" max="2100" placeholder="2024" value="${esc(f.y)}"></label>
+     </div>
+     <div class="lab" style="margin-top:4px">Gêneros</div><div class="chips wrapc" id="fgen"></div>
+     <label class="fl">Sinopse (opcional)<textarea class="fi" id="f_s" rows="3" maxlength="400" placeholder="Do que se trata?">${esc(f.s)}</textarea></label>
+     ${ed?'':'<div class="lab">Status inicial</div><div class="stg" id="fst"></div>'}
+     <div class="acts"><button class="btn" data-a="saveadd">${ed?'Salvar alterações':'Adicionar à minha lista'}</button>${ed?'<button class="btn ghost" data-a="canceledit">Cancelar</button><button class="btn danger" data-a="delcustom">Remover</button>':''}</div>
+    </div></div></section>`;
+}
+function fillAdd(){
+  const f=UI.form;
+  $('#fgen').innerHTML=GENRES.map(g=>`<button class="chip ${f.g.includes(g)?'on':''}" data-a="fgenre" data-v="${esc(g)}">${g}</button>`).join('');
+  const st=$('#fst');
+  if(st)st.innerHTML=ORDER.map(k=>`<button class="sbtn ${f.st===k?'on':''}" style="${f.st===k?'color:'+STATUS[k].c:''}" data-a="fstatus" data-v="${k}">${STATUS[k].e} ${STATUS[k].l}</button>`).join('');
+  fillCov();
+}
+function fillCov(){
+  const f=UI.form,tmp={id:UI.edit||S.nid+1,t:f.t||'Novo anime',y:parseInt(f.y,10)||0,h:hue(f.t||'x')};
+  const src=f.c||mkCover(tmp);
+  $('#fcov').innerHTML=`<div class="cvprev"><img src="${src}" alt="Prévia da capa"></div>
+    <button class="btn ghost" data-a="fpick" style="width:100%;margin-top:10px">🖼️ ${f.c?'Trocar capa':'Escolher capa da galeria'}</button>
+    ${f.c?'<button class="btn ghost" data-a="fcoverreset" style="width:100%;margin-top:8px">Remover capa</button>':''}
+    <input type="file" id="fcvfile" accept="image/*" hidden>`;
+}
+function readCover(file,cb){
+  const rd=new FileReader();
+  rd.onload=()=>{const im=new Image();im.onload=()=>{
+    const w=Math.min(420,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    cv.getContext('2d').drawImage(im,0,0,w,h);cb(cv.toDataURL('image/jpeg',.82))};
+    im.onerror=()=>toast('Não foi possível ler essa imagem');im.src=rd.result};
+  rd.readAsDataURL(file);
+}
+function saveCustom(){
+  const f=UI.form,t=f.t.trim(),eps=parseInt(f.eps,10),y=parseInt(f.y,10)||0;
+  if(!t)return toast('Digite o nome do anime.');
+  if(!(eps>=1&&eps<=5000))return toast('Informe os episódios (de 1 a 5000).');
+  if(y&&(y<1900||y>2100))return toast('Ano inválido.');
+  const dup=ANIMES.find(a=>norm(a.t)===norm(t)&&a.id!==UI.edit);
+  if(dup){toast('Esse anime já existe na sua coleção.');openSheet(dup.id);return}
+  const s=f.s.trim()||DEFSYN;
+  if(UI.edit){
+    const a=byId[UI.edit];
+    Object.assign(a,{t,eps,y,g:f.g.slice(),s,h:hue(t)});
+    delete covers[a.id];
+    upd(a.id,{c:f.c});
+    if((it(a.id).p||0)>eps)upd(a.id,{p:eps});
+    save();
+    UI.edit=null;UI.form=blankForm();go('list');toast('Alterações salvas');return;
+  }
+  const id=++S.nid;
+  const a={id,t,eps,y,g:f.g.slice(),h:hue(t),tag:'C',s,alt:'',custom:true};
+  ANIMES.push(a);byId[id]=a;S.custom.push(a);
+  const patch={st:f.st};if(f.st==='watched')patch.p=eps;if(f.c)patch.c=f.c;
+  upd(id,patch);
+  UI.form=blankForm();UI.lf='all';
+  go('list');toast('Anime adicionado à sua lista');
+}
+function openEdit(id){
+  const a=byId[id];if(!a)return;
+  UI.edit=id;
+  UI.form={t:a.t,eps:String(a.eps),y:a.y?String(a.y):'',g:a.g.slice(),s:a.s===DEFSYN?'':a.s,st:it(id).st||'planned',c:it(id).c||''};
+  go('add');
+}
+
+/* ---------- renderização ---------- */
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(t=>t[0]==='add'?`<button class="fab ${UI.tab==='add'?'on':''}" data-a="tab" data-v="add" aria-label="Adicionar anime">+</button>`:`<button class="tab ${UI.tab===t[0]?'on':''}" data-a="tab" data-v="${t[0]}" aria-label="${t[2]}" ${UI.tab===t[0]?'aria-current="page"':''}><span class="ic">${t[1]}</span><span>${t[2]}</span></button>`).join('');
+  $('#hav').textContent=(S.name||'O').charAt(0).toUpperCase();
+}
+function renderView(keepScroll){
+  const f={home:vHome,explore:vExplore,add:vAdd,list:vList,favs:vFavs,profile:vProfile}[UI.tab];
+  const y=window.scrollY;
+  const v=$('#view');v.style.animation='none';v.innerHTML=f();void v.offsetHeight;v.style.animation='';
+  if(UI.tab==='explore')fillExplore();
+  if(UI.tab==='list')fillList();
+  if(UI.tab==='add')fillAdd();
+  renderTabs();
+  if(keepScroll)window.scrollTo(0,y);
+}
+function go(t){if(t!=='add'&&UI.edit){UI.edit=null;UI.form=blankForm()}UI.tab=t;closeSheet();closeDlg();renderView();window.scrollTo(0,0)}
+
+/* ---------- detalhe do anime ---------- */
+let curId=null;
+function sheetHTML(a){
+  const i=it(a.id),p=prog(a.id),r=i.r||0;
+  return `<div class="grab"></div><button class="xbtn btn ghost" data-a="close" aria-label="Fechar" style="padding:8px 13px">✕</button>
+  <div class="sh"><img src="${cover(a)}" alt="Capa de ${esc(a.t)}">
+    <div style="min-width:0"><h2>${esc(a.t)}</h2>${a.alt?`<div class="alt">${esc(a.alt)}</div>`:''}
+      <div class="facts">${a.eps} episódio${a.eps>1?'s':''} · ${yr(a)}</div>
+      <div class="tags">${a.g.map(g=>`<span>${g}</span>`).join('')}${a.tag==='G'?'<span>💎 Joia</span>':''}${a.custom?'<span>✨ Seu anime</span>':''}</div>
+      <button class="btn ${i.f?'':'ghost'}" data-a="fav" data-v="${a.id}" style="padding:9px 14px">${i.f?'♥ Nos favoritos':'♡ Favoritar'}</button></div></div>
+  <p class="syn">${esc(a.s)}</p>
+  <div class="lab">Status</div>
+  <div class="stg">${ORDER.map(k=>`<button class="sbtn ${i.st===k?'on':''}" style="${i.st===k?'color:'+STATUS[k].c:''}" data-a="status" data-v="${k}">${STATUS[k].e} ${STATUS[k].l}</button>`).join('')}</div>
+  <div class="lab">Sua nota</div>
+  <div class="prog"><div class="stars" role="group" aria-label="Nota de 0 a 10">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${n<=r?'on':''}" data-a="rate" data-v="${n}" aria-label="${n} estrela${n>1?'s':''}">★</button>`).join('')}</div><span class="rnum" id="rnum">${r}/10</span></div>
+  <div class="lab">Progresso</div>
+  <div class="prog"><button class="step" data-a="step" data-v="-1" aria-label="Menos um episódio">−</button>
+    <input type="range" id="prange" min="0" max="${a.eps}" value="${p}" aria-label="Episódios assistidos">
+    <button class="step" data-a="step" data-v="1" aria-label="Mais um episódio">+</button>
+    <span class="ptxt" id="ptxt">${p} / ${a.eps}</span></div>
+  <div class="acts"><button class="btn ghost" data-a="pickcover">🖼️ Usar minha capa</button>${i.c?'<button class="btn ghost" data-a="coverreset">Voltar à capa padrão</button>':''}
+    ${a.custom?'<button class="btn ghost" data-a="edit">✏️ Editar anime</button>':''}<input type="file" id="cvfile" accept="image/*" hidden></div>`;
+}
+function openSheet(id){curId=+id;$('#panel').innerHTML=sheetHTML(byId[curId]);$('#sheet').classList.add('open');document.body.style.overflow='hidden'}
+function refreshSheet(){if(curId&&$('#sheet').classList.contains('open')){const sc=$('#panel').scrollTop;$('#panel').innerHTML=sheetHTML(byId[curId]);$('#panel').scrollTop=sc}}
+function closeSheet(){$('#sheet').classList.remove('open');curId=null;if(!$('#dlgo').classList.contains('open'))document.body.style.overflow=''}
+function showDlg(html){$('#dlg').innerHTML=`<div class="grab"></div><button class="xbtn btn ghost" data-a="closedlg" aria-label="Fechar" style="padding:8px 13px">✕</button>`+html;$('#dlgo').classList.add('open');document.body.style.overflow='hidden'}
+function closeDlg(){$('#dlgo').classList.remove('open');if(!$('#sheet').classList.contains('open'))document.body.style.overflow=''}
+function afterChange(){refreshSheet();renderView(true)}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');
+  if(e.target.id==='sheet')return closeSheet();
+  if(e.target.id==='dlgo')return closeDlg();
+  if(!t)return;
+  const a=t.dataset.a,v=t.dataset.v;
+  switch(a){
+    case 'tab':go(v);break;
+    case 'open':openSheet(v);break;
+    case 'close':closeSheet();break;
+    case 'closedlg':closeDlg();break;
+    case 'fav':{const on=!it(v).f;upd(+v,{f:on});toast(on?'Adicionado aos favoritos':'Removido dos favoritos');afterChange();break}
+    case 'status':setStatus(curId,v);afterChange();toast(it(curId).st?'Status: '+STATUS[it(curId).st].l:'Status removido');break;
+    case 'rate':setRate(curId,+v);afterChange();break;
+    case 'step':setProg(curId,prog(curId)+(+v));afterChange();break;
+    case 'genre':UI.g=v;fillExplore();break;
+    case 'type':UI.type=v;fillExplore();break;
+    case 'lf':UI.lf=v;fillList();break;
+    case 'rand':{const l=ANIMES.filter(a=>matches(a,UI.q,UI.g,UI.type));if(l.length)openSheet(l[Math.floor(Math.random()*l.length)].id);break}
+    case 'pickcover':$('#cvfile').click();break;
+    case 'edit':openEdit(curId);break;
+    case 'fgenre':{const g=UI.form.g,i=g.indexOf(v);if(i<0)g.push(v);else g.splice(i,1);fillAdd();break}
+    case 'fstatus':UI.form.st=v;fillAdd();break;
+    case 'fpick':$('#fcvfile').click();break;
+    case 'fcoverreset':UI.form.c='';fillCov();break;
+    case 'saveadd':saveCustom();break;
+    case 'canceledit':UI.edit=null;UI.form=blankForm();go('list');break;
+    case 'delcustom':showDlg(`<div class="lab" style="margin-top:0">Remover este anime?</div><div class="note">Ele sai da sua coleção junto com status, nota e progresso. Essa ação não pode ser desfeita.</div><div class="acts"><button class="btn danger" data-a="dodel">Remover</button><button class="btn ghost" data-a="closedlg">Cancelar</button></div>`);break;
+    case 'dodel':{const id=UI.edit,i=ANIMES.findIndex(a=>a.id===id);if(i>=0)ANIMES.splice(i,1);delete byId[id];S.custom=S.custom.filter(c=>c.id!==id);delete S.items[id];delete covers[id];save();UI.edit=null;UI.form=blankForm();closeDlg();go('list');toast('Anime removido');break}
+    case 'coverreset':upd(curId,{c:''});afterChange();break;
+    case 'export':showDlg(`<div class="lab" style="margin-top:0">Exportar backup</div><div class="note">Copie o texto abaixo e guarde onde quiser (notas, e-mail, nuvem).</div><textarea id="bk" readonly>${esc(JSON.stringify(S))}</textarea><div class="acts"><button class="btn" data-a="copybk">Copiar</button></div>`);break;
+    case 'copybk':{const ta=$('#bk');ta.select();try{navigator.clipboard.writeText(ta.value).then(()=>toast('Backup copiado'),()=>{document.execCommand('copy');toast('Backup copiado')})}catch(err){try{document.execCommand('copy');toast('Backup copiado')}catch(e2){toast('Selecione o texto e copie manualmente')}}break}
+    case 'import':showDlg(`<div class="lab" style="margin-top:0">Importar backup</div><div class="note">Cole aqui o backup exportado. Isso substitui os dados atuais.</div><textarea id="bk" placeholder="Cole o backup aqui"></textarea><div class="acts"><button class="btn" data-a="doimport">Importar</button></div>`);break;
+    case 'doimport':{try{const o=JSON.parse($('#bk').value);if(!o||typeof o.items!=='object')throw 0;applyState(o);closeDlg();renderView();toast('Backup importado')}catch(err){toast('Backup inválido. Confira o texto colado.')}break}
+    case 'reset':showDlg(`<div class="lab" style="margin-top:0">Apagar todos os dados?</div><div class="note">Status, notas, progresso, favoritos, capas e animes que você adicionou serão removidos deste aparelho. Essa ação não pode ser desfeita.</div><div class="acts"><button class="btn danger" data-a="doreset">Apagar tudo</button><button class="btn ghost" data-a="closedlg">Cancelar</button></div>`);break;
+    case 'doreset':applyState({});closeDlg();renderView();toast('Dados apagados');break;
+    case 'fbcfg':{let cur='';try{cur=localStorage.getItem(FBKEY)||''}catch(e){}showDlg(`<div class="lab" style="margin-top:0">Configurar Firebase</div><div class="note">No console do Firebase, crie um app Web e cole aqui o objeto firebaseConfig em formato JSON (com aspas nas chaves). Ative o login com Google e o Firestore no projeto.</div><textarea id="fbta" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'>${esc(cur)}</textarea><div class="acts"><button class="btn" data-a="fbsavecfg">Salvar configuração</button></div>`);break}
+    case 'fbsavecfg':{try{const o=JSON.parse($('#fbta').value);if(!o.apiKey||!o.projectId)throw 0;localStorage.setItem(FBKEY,JSON.stringify(o));closeDlg();renderView(true);toast('Firebase configurado');fbReady=null;if(authOpen())renderAuth();initAuth()}catch(err){toast('Configuração inválida. Use JSON com apiKey e projectId.')}break}
+    case 'showauth':AUTH.mode='up';AUTH.fromApp=true;showAuth('');break;
+    case 'showauthin':AUTH.mode='in';AUTH.fromApp=true;showAuth('');break;
+    case 'authback':hideAuth();break;
+    case 'authmode':AUTH.mode=v;renderAuth();break;
+    case 'authgo':authGo();break;
+    case 'authgoogle':authGoogle();break;
+    case 'forgot':authForgot();break;
+    case 'showpass':{const pi=$('#a_pass');if(pi)pi.type=pi.type==='password'?'text':'password';break}
+    case 'guest':try{localStorage.setItem(GUEST,'1')}catch(err){}hideAuth();renderView(true);toast('Usando sem conta. Seus dados ficam só neste aparelho.');break;
+    case 'fblogout':cloud(async fb=>{await fb.auth().signOut();try{localStorage.removeItem(ACCT)}catch(e){}toast('Você saiu da conta')});break;
+    case 'usecloud':if(pendingCloud){applyState(pendingCloud);pendingCloud=null;renderView(true);toast('Coleção da nuvem carregada')}syncOn=true;setLast();closeDlg();break;
+    case 'keeplocal':syncOn=true;setLast();pushNow().then(()=>toast('Coleção deste aparelho enviada para a nuvem'),()=>toast('Não consegui enviar agora.'));pendingCloud=null;closeDlg();break;
+    case 'fbsave':cloud(async fb=>{const u=fb.auth().currentUser;if(!u)throw new Error('Entre com sua conta Google primeiro.');await fb.firestore().collection('otakuvault').doc(u.uid).set({data:JSON.stringify(S),updated:Date.now()});syncOn=true;toast('Coleção enviada para a nuvem')});break;
+    case 'fbload':cloud(async fb=>{const u=fb.auth().currentUser;if(!u)throw new Error('Entre com sua conta Google primeiro.');const d=await fb.firestore().collection('otakuvault').doc(u.uid).get();if(!d.exists)throw new Error('Nenhuma coleção salva na nuvem ainda.');const o=JSON.parse(d.data().data);applyState(Object.assign({name:S.name},o));renderView(true);toast('Coleção restaurada da nuvem')});break;
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($('#dlgo').classList.contains('open'))closeDlg();else closeSheet()}
+  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('card')){e.preventDefault();openSheet(e.target.dataset.v)}
+});
+document.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(id==='q'){UI.q=e.target.value;fillExplore()}
+  else if(id==='f_t'){UI.form.t=e.target.value;if(!UI.form.c)fillCov()}
+  else if(id==='f_eps'){UI.form.eps=e.target.value}
+  else if(id==='f_y'){UI.form.y=e.target.value;if(!UI.form.c)fillCov()}
+  else if(id==='f_s'){UI.form.s=e.target.value}
+  else if(id==='a_email'){AUTH.email=e.target.value}
+  else if(id==='a_name'){AUTH.name=e.target.value}
+  else if(id==='lq'){UI.lq=e.target.value;fillList()}
+  else if(id==='uname'){S.name=e.target.value.trim();save();renderTabs();const av=document.querySelector('.pf .av');if(av)av.textContent=(S.name||'O').charAt(0).toUpperCase()}
+  else if(id==='prange'){const a=byId[curId],p=+e.target.value;setProg(curId,p);$('#ptxt').textContent=p+' / '+a.eps}
+});
+document.addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='sort'){UI.sort=e.target.value;fillList()}
+  else if(id==='prange'){afterChange()}
+  else if(id==='fcvfile'&&e.target.files[0]){readCover(e.target.files[0],d=>{UI.form.c=d;fillCov()})}
+  else if(id==='cvfile'&&e.target.files[0]){
+    const f=e.target.files[0],rd=new FileReader();
+    rd.onload=()=>{const im=new Image();im.onload=()=>{
+      const w=Math.min(420,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(im,0,0,w,h);upd(curId,{c:cv.toDataURL('image/jpeg',.82)});afterChange();toast('Capa personalizada salva')};
+      im.onerror=()=>toast('Não foi possível ler essa imagem');im.src=rd.result};
+    rd.readAsDataURL(f);
+  }
+});
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
+
+/* ---------- Firebase (carregado só quando configurado) ---------- */
+const FB_VER='10.12.2';
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Não foi possível carregar o Firebase neste ambiente.'));document.head.appendChild(s)})}
+async function cloud(fn){
+  try{
+    if(!getCfg()){toast('Configure o Firebase primeiro.');return}
+    await fn(await getFB());
+  }catch(err){toast(errMsg(err))}
+}
+
+/* ---------- LOGIN, CONTA E SINCRONIZAÇÃO ---------- */
+const AUTH={mode:'in',email:'',name:'',loading:false,note:'',fromApp:false};
+let fbReady=null,authObs=false,pendingCloud=null;
+function getCfg(){
+  if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId)return FIREBASE_CONFIG;
+  try{return JSON.parse(localStorage.getItem(FBKEY)||'null')}catch(e){return null}
+}
+function getFB(){
+  if(fbReady)return fbReady;
+  fbReady=(async()=>{
+    const cfg=getCfg();if(!cfg)throw new Error('nocfg');
+    if(!window.firebase){for(const m of['app','auth','firestore'])await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-${m}-compat.js`)}
+    if(!firebase.apps.length)firebase.initializeApp(cfg);
+    return firebase;
+  })();
+  fbReady.catch(()=>{fbReady=null});
+  return fbReady;
+}
+const AERR={
+  'auth/invalid-email':'E-mail inválido.',
+  'auth/user-not-found':'Não existe conta com esse e-mail. Toque em "Criar conta".',
+  'auth/wrong-password':'Senha incorreta.',
+  'auth/invalid-credential':'E-mail ou senha incorretos. Se ainda não tem conta, toque em "Criar conta".',
+  'auth/invalid-login-credentials':'E-mail ou senha incorretos. Se ainda não tem conta, toque em "Criar conta".',
+  'auth/email-already-in-use':'Esse e-mail já tem conta. Toque em "Entrar".',
+  'auth/weak-password':'A senha precisa ter pelo menos 6 caracteres.',
+  'auth/missing-password':'Digite sua senha.',
+  'auth/network-request-failed':'Sem conexão com o Firebase. Verifique a internet e se o app está hospedado no seu domínio.',
+  'auth/too-many-requests':'Muitas tentativas. Aguarde um pouco e tente de novo.',
+  'auth/popup-closed-by-user':'Login cancelado.',
+  'auth/cancelled-popup-request':'Login cancelado.',
+  'auth/popup-blocked':'O navegador bloqueou a janela do Google. Libere pop-ups e tente de novo.',
+  'auth/unauthorized-domain':'Este endereço não está autorizado no Firebase (Authentication > Configurações > Domínios autorizados).',
+  'auth/operation-not-allowed':'Esse método de login não está ativado no Firebase (Authentication > Método de login).',
+  'auth/user-disabled':'Essa conta foi desativada.'
+};
+function errMsg(err){
+  if(!err)return 'Erro desconhecido.';
+  if(err.message==='nocfg')return 'Firebase ainda não configurado. Toque em "Configurar Firebase".';
+  if(err.code&&AERR[err.code])return AERR[err.code];
+  return err.message||'Erro ao falar com a nuvem.';
+}
+const authOpen=()=>$('#auth').classList.contains('open');
+const ACCT='otakuvault.acct',LASTUID='otakuvault.lastuid';
+const hasAcct=()=>{try{return localStorage.getItem(ACCT)==='1'}catch(e){return false}};
+const lastUid=()=>{try{return localStorage.getItem(LASTUID)}catch(e){return null}};
+function setLast(){try{localStorage.setItem(LASTUID,U.uid)}catch(e){}}
+function mergeState(a,b){
+  const items=Object.assign({},b.items||{});
+  for(const id in (a.items||{})){const x=a.items[id],y=items[id];if(!y||(x.u||0)>=(y.u||0))items[id]=x}
+  const cm={};[].concat(b.custom||[],a.custom||[]).forEach(c=>{cm[c.id]=c});
+  return{name:a.name||b.name||'',items,custom:Object.values(cm),nid:Math.max(a.nid||1000,b.nid||1000)};
+}
+function isGuest(){try{return localStorage.getItem(GUEST)==='1'}catch(e){return false}}
+function showAuth(note){
+  if(note!==undefined)AUTH.note=note;
+  $('#auth').classList.add('open');document.body.style.overflow='hidden';renderAuth();
+}
+function hideAuth(){AUTH.fromApp=false;$('#auth').classList.remove('open');$('#auth').classList.remove('busy');document.body.style.overflow=''}
+function aerr(m,ok){const el=$('#aerr');if(el){el.textContent=m;el.className='aerr'+(ok?' ok':'')}}
+function busy(b){const a=$('#auth');if(b)a.classList.add('busy');else a.classList.remove('busy')}
+function renderAuth(){
+  const up=AUTH.mode==='up',cfg=!!getCfg();
+  const logo=`<div class="alogo"><svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14L16 30 4 23V9z" fill="#0a1226" stroke="#2ea8ff" stroke-width="1.8"/><path d="M16 9v7m0 0 6 3.5M16 16l-6 3.5" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/></svg><span>OtakuVault</span></div>`;
+  if(AUTH.loading){$('#auth').innerHTML=`<div class="aw"><div class="splash"><div><div class="spin"></div>Conectando...</div></div></div>`;return}
+  $('#auth').innerHTML=`<div class="aw">${AUTH.fromApp?'<button class="link" data-a="authback" style="margin-bottom:6px">← Voltar ao app</button>':''}${logo}
+    <h1>${up?'Criar conta':'Entrar'}</h1>
+    <p class="sub" style="margin:0">${up?'Salve sua coleção na nuvem e acesse de qualquer aparelho.':'Entre para sincronizar sua coleção entre seus aparelhos.'}</p>
+    <div class="seg" role="tablist"><button class="${up?'':'on'}" data-a="authmode" data-v="in">Entrar</button><button class="${up?'on':''}" data-a="authmode" data-v="up">Criar conta</button></div>
+    ${!cfg?`<div class="anote">O Firebase ainda não foi configurado, então entrar e criar conta ficam desativados por enquanto. Você pode continuar sem conta.</div>`:''}
+    ${AUTH.note?`<div class="anote">${esc(AUTH.note)}</div>`:''}
+    <div id="aerr" class="aerr" role="alert"></div>
+    ${up?`<label class="fl">Nome<input class="fi" id="a_name" maxlength="24" autocomplete="name" placeholder="Como quer ser chamado" value="${esc(AUTH.name)}"></label>`:''}
+    <label class="fl">E-mail<input class="fi" id="a_email" type="email" inputmode="email" autocomplete="email" placeholder="voce@email.com" value="${esc(AUTH.email)}"></label>
+    <label class="fl">Senha<div class="pw"><input class="fi" id="a_pass" type="password" autocomplete="${up?'new-password':'current-password'}" placeholder="${up?'Mínimo de 6 caracteres':'Sua senha'}"><button type="button" data-a="showpass" aria-label="Mostrar ou ocultar senha">👁️</button></div></label>
+    ${up?`<label class="fl">Confirmar senha<input class="fi" id="a_pass2" type="password" autocomplete="new-password" placeholder="Repita a senha"></label>`:`<button class="link" data-a="forgot" style="margin:-6px 0 12px">Esqueci minha senha</button>`}
+    <button class="btn wide" data-a="authgo">${up?'Criar conta':'Entrar'}</button>
+    <div class="or"><span>ou</span></div>
+    <button class="btn ghost wide" data-a="authgoogle"><b style="font-family:var(--display)">G</b> Continuar com Google</button>
+    <p class="sw">${up?'Já tem conta?':'Ainda não tem conta?'} <button class="link" data-a="authmode" data-v="${up?'in':'up'}">${up?'Entrar':'Criar conta'}</button></p>
+    ${AUTH.fromApp?'':'<button class="btn ghost wide" data-a="guest" style="margin-top:8px">Entrar sem conta</button><div class="note" style="text-align:center;margin-top:8px">Você pode criar a conta depois, pelo Perfil.</div>'}
+    <button class="link center dim" data-a="fbcfg">Configurar Firebase</button>
+  </div>`;
+}
+async function authGo(){
+  const up=AUTH.mode==='up',em=($('#a_email').value||'').trim(),pw=$('#a_pass').value||'';
+  AUTH.email=em;
+  if(!em||!pw)return aerr('Preencha e-mail e senha.');
+  let nm='';
+  if(up){
+    nm=($('#a_name').value||'').trim();AUTH.name=nm;
+    if(pw.length<6)return aerr('A senha precisa ter pelo menos 6 caracteres.');
+    if(pw!==$('#a_pass2').value)return aerr('As senhas não conferem.');
+  }
+  aerr('');busy(true);
+  try{
+    const fb=await getFB();
+    if(up){
+      const r=await fb.auth().createUserWithEmailAndPassword(em,pw);
+      if(nm){try{await r.user.updateProfile({displayName:nm})}catch(e){}if(!S.name){S.name=nm;save()}}
+    }else await fb.auth().signInWithEmailAndPassword(em,pw);
+  }catch(err){aerr(errMsg(err))}
+  busy(false);
+}
+async function authGoogle(){
+  aerr('');busy(true);
+  try{
+    const fb=await getFB(),prov=new fb.auth.GoogleAuthProvider();
+    try{await fb.auth().signInWithPopup(prov)}
+    catch(err){if(err&&err.code==='auth/popup-blocked'){await fb.auth().signInWithRedirect(prov);return}throw err}
+  }catch(err){aerr(errMsg(err))}
+  busy(false);
+}
+async function authForgot(){
+  const em=($('#a_email').value||'').trim();AUTH.email=em;
+  if(!em)return aerr('Digite seu e-mail acima para receber o link de redefinição.');
+  busy(true);
+  try{const fb=await getFB();await fb.auth().sendPasswordResetEmail(em);aerr('Enviamos um link de redefinição para '+em+'. Confira também o spam.',true)}
+  catch(err){aerr(errMsg(err))}
+  busy(false);
+}
+function schedulePush(){clearTimeout(pushT);pushT=setTimeout(()=>{pushNow().catch(()=>{})},1500)}
+async function pushNow(){
+  if(!U)return;
+  await firebase.firestore().collection('otakuvault').doc(U.uid).set({data:JSON.stringify(S),updated:Date.now()});
+}
+async function syncDown(known){
+  try{
+    const d=await firebase.firestore().collection('otakuvault').doc(U.uid).get();
+    const hasLocal=Object.keys(S.items).length>0||S.custom.length>0;
+    if(!d.exists){syncOn=true;if(hasLocal)await pushNow();toast('Conectado. Sua coleção agora é salva na nuvem.');return}
+    const o=JSON.parse(d.data().data);
+    const hasRemote=Object.keys(o.items||{}).length>0||(o.custom||[]).length>0;
+    if(!hasLocal&&hasRemote){applyState(Object.assign({name:S.name},o));syncOn=true;renderView(true);toast('Coleção restaurada da nuvem');return}
+    if(!hasRemote){syncOn=true;if(hasLocal)await pushNow();toast('Conectado');return}
+    if(JSON.stringify(o.items)===JSON.stringify(S.items)&&(o.custom||[]).length===S.custom.length){syncOn=true;toast('Conectado');return}
+    if(known){applyState(mergeState(S,o));syncOn=true;await pushNow();renderView(true);toast('Coleção sincronizada');return}
+    pendingCloud=Object.assign({name:S.name},o);
+    showDlg(`<div class="lab" style="margin-top:0">Qual coleção você quer usar?</div><div class="note">Encontramos uma coleção salva nesta conta e também dados neste aparelho. Escolha qual manter. A outra será substituída.</div><div class="acts"><button class="btn" data-a="usecloud">Usar a da nuvem</button><button class="btn ghost" data-a="keeplocal">Manter deste aparelho</button></div>`);
+  }catch(err){toast('Conectado, mas não consegui sincronizar agora.')}
+}
+async function onUser(user){
+  const known=lastUid()===user.uid;
+  U=user;syncOn=false;
+  try{localStorage.removeItem(GUEST);localStorage.setItem(ACCT,'1')}catch(e){}
+  hideAuth();
+  if(!S.name&&user.displayName){S.name=user.displayName;save()}
+  renderView(true);
+  await syncDown(known);
+  if(syncOn)setLast();
+}
+async function initAuth(){
+  if(!getCfg()){if(!isGuest())showAuth();return}
+  if(!isGuest()){AUTH.loading=true;showAuth()}
+  try{
+    const fb=await getFB();
+    if(authObs)return;authObs=true;
+    fb.auth().onAuthStateChanged(user=>{
+      AUTH.loading=false;
+      if(user)onUser(user);
+      else{U=null;syncOn=false;if(isGuest())hideAuth();else showAuth();renderView(true)}
+    });
+  }catch(err){
+    AUTH.loading=false;
+    if(isGuest()||hasAcct())hideAuth();
+    else showAuth('Não foi possível conectar ao Firebase agora. Você pode continuar sem conta e entrar depois.');
+  }
+}
+function cloudBox(){
+  if(U)return `<div class="note">Conectado como <b>${esc(U.displayName||U.email||'sua conta')}</b>. Sua coleção é salva na nuvem automaticamente.</div><div class="row2"><button class="btn ghost" data-a="fbsave">Sincronizar agora</button><button class="btn ghost" data-a="fbload">Baixar da nuvem</button><button class="btn danger" data-a="fblogout">Sair</button></div>`;
+  const cfg=!!getCfg();
+  return `<div class="note">${cfg?'Você está sem conta: seus animes ficam só neste aparelho e somem se você desinstalar o app. Crie uma conta para guardar tudo na nuvem e recuperar em qualquer aparelho.':cloudText()}</div><div class="row2">${cfg?'<button class="btn" data-a="showauth">Criar conta</button><button class="btn ghost" data-a="showauthin">Já tenho conta</button>':'<button class="btn ghost" data-a="fbcfg">Configurar Firebase</button>'}</div>`;
+}
+try{window.addEventListener('online',()=>{if(U&&!syncOn)syncDown(lastUid()===U.uid).then(()=>{if(syncOn)setLast()})})}catch(e){}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id&&e.target.id.indexOf('a_')===0){e.preventDefault();authGo()}});
+
+/* ---------- PWA ---------- */
+try{
+  const icon='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#05070d"/><path d="M256 70 420 160v192L256 442 92 352V160z" fill="#0a1226" stroke="#2ea8ff" stroke-width="22"/><path d="M256 160v96m0 0 84 48M256 256l-84 48" stroke="#00e5ff" stroke-width="22" stroke-linecap="round"/></svg>');
+  const man={name:'OtakuVault',short_name:'OtakuVault',description:'Sua biblioteca pessoal de animes',start_url:'.',display:'standalone',orientation:'portrait',background_color:'#05070d',theme_color:'#05070d',icons:[{src:icon,sizes:'any',type:'image/svg+xml',purpose:'any maskable'}]};
+  if(!$('#mf').getAttribute('href'))$('#mf').href=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:'application/manifest+json'}));
+}catch(e){}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('service-worker.js').catch(()=>{})}
+
+renderView();
+initAuth();
+</script>
+</body>
+</html>
