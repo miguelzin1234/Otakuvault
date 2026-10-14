@@ -648,8 +648,8 @@ function fillCov(){
 function readCover(file,cb){
   const rd=new FileReader();
   rd.onload=()=>{const im=new Image();im.onload=()=>{
-    const w=Math.min(420,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
-    cv.getContext('2d').drawImage(im,0,0,w,h);cb(cv.toDataURL('image/jpeg',.82))};
+    const w=Math.min(300,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    cv.getContext('2d').drawImage(im,0,0,w,h);cb(cv.toDataURL('image/jpeg',.7))};
     im.onerror=()=>toast('Não foi possível ler essa imagem');im.src=rd.result};
   rd.readAsDataURL(file);
 }
@@ -783,7 +783,7 @@ document.addEventListener('click',e=>{
     case 'fblogout':cloud(async fb=>{await fb.auth().signOut();try{localStorage.removeItem(ACCT)}catch(e){}toast('Você saiu da conta')});break;
     case 'usecloud':if(pendingCloud){applyState(pendingCloud);pendingCloud=null;renderView(true);toast('Coleção da nuvem carregada')}syncOn=true;setLast();closeDlg();break;
     case 'keeplocal':syncOn=true;setLast();pushNow().then(()=>toast('Coleção deste aparelho enviada para a nuvem'),()=>toast('Não consegui enviar agora.'));pendingCloud=null;closeDlg();break;
-    case 'fbsave':cloud(async fb=>{const u=fb.auth().currentUser;if(!u)throw new Error('Entre com sua conta Google primeiro.');await fb.firestore().collection('otakuvault').doc(u.uid).set({data:JSON.stringify(S),updated:Date.now()});syncOn=true;toast('Coleção enviada para a nuvem')});break;
+    case 'fbsave':cloud(async fb=>{const u=fb.auth().currentUser;if(!u)throw new Error('Entre com sua conta Google primeiro.');const ref=fb.firestore().collection('otakuvault').doc(u.uid);const hasLocal=Object.keys(S.items).length>0||S.custom.length>0;if(!hasLocal){const d=await ref.get();if(d.exists)throw new Error('Este aparelho está sem animes. Use "Baixar da nuvem" para não apagar o que está salvo.')}await ref.set({data:payload(),updated:Date.now()});SYNC.ok=true;SYNC.msg='';SYNC.t=Date.now();syncOn=true;renderView(true);toast('Coleção enviada para a nuvem')});break;
     case 'fbload':cloud(async fb=>{const u=fb.auth().currentUser;if(!u)throw new Error('Entre com sua conta Google primeiro.');const d=await fb.firestore().collection('otakuvault').doc(u.uid).get();if(!d.exists)throw new Error('Nenhuma coleção salva na nuvem ainda.');const o=JSON.parse(d.data().data);applyState(Object.assign({name:S.name},o));renderView(true);toast('Coleção restaurada da nuvem')});break;
   }
 });
@@ -812,8 +812,8 @@ document.addEventListener('change',e=>{
   else if(id==='cvfile'&&e.target.files[0]){
     const f=e.target.files[0],rd=new FileReader();
     rd.onload=()=>{const im=new Image();im.onload=()=>{
-      const w=Math.min(420,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
-      cv.getContext('2d').drawImage(im,0,0,w,h);upd(curId,{c:cv.toDataURL('image/jpeg',.82)});afterChange();toast('Capa personalizada salva')};
+      const w=Math.min(300,im.width),h=Math.round(im.height*w/im.width),cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(im,0,0,w,h);upd(curId,{c:cv.toDataURL('image/jpeg',.7)});afterChange();toast('Capa personalizada salva')};
       im.onerror=()=>toast('Não foi possível ler essa imagem');im.src=rd.result};
     rd.readAsDataURL(f);
   }
@@ -870,6 +870,7 @@ function errMsg(err){
   if(!err)return 'Erro desconhecido.';
   if(err.message==='nocfg')return 'Firebase ainda não configurado. Toque em "Configurar Firebase".';
   if(err.code&&AERR[err.code])return AERR[err.code];
+  if(err.code&&/^(permission-denied|not-found|failed-precondition|unavailable)$/.test(err.code))return fsMsg(err);
   return err.message||'Erro ao falar com a nuvem.';
 }
 const authOpen=()=>$('#auth').classList.contains('open');
@@ -879,7 +880,7 @@ const lastUid=()=>{try{return localStorage.getItem(LASTUID)}catch(e){return null
 function setLast(){try{localStorage.setItem(LASTUID,U.uid)}catch(e){}}
 function mergeState(a,b){
   const items=Object.assign({},b.items||{});
-  for(const id in (a.items||{})){const x=a.items[id],y=items[id];if(!y||(x.u||0)>=(y.u||0))items[id]=x}
+  for(const id in (a.items||{})){const x=a.items[id],y=items[id];if(!y||(x.u||0)>=(y.u||0))items[id]=x;else if(x.c&&!y.c)items[id]=Object.assign({},y,{c:x.c})}
   const cm={};[].concat(b.custom||[],a.custom||[]).forEach(c=>{cm[c.id]=c});
   return{name:a.name||b.name||'',items,custom:Object.values(cm),nid:Math.max(a.nid||1000,b.nid||1000)};
 }
@@ -951,10 +952,33 @@ async function authForgot(){
   catch(err){aerr(errMsg(err))}
   busy(false);
 }
-function schedulePush(){clearTimeout(pushT);pushT=setTimeout(()=>{pushNow().catch(()=>{})},1500)}
+const SYNC={ok:null,msg:'',t:0,warn:''};
+function payload(){
+  let json=JSON.stringify(S);
+  if(json.length>850000){
+    const o=JSON.parse(json);
+    for(const id in o.items){if(o.items[id].c)delete o.items[id].c}
+    SYNC.warn='As capas personalizadas não couberam na nuvem. Status, notas, favoritos e animes adicionados foram salvos.';
+    return JSON.stringify(o);
+  }
+  SYNC.warn='';
+  return json;
+}
+function fsMsg(err){
+  const c=(err&&err.code)||'';
+  if(c==='permission-denied')return 'A nuvem recusou salvar. Confira se as regras do Firestore foram publicadas.';
+  if(c==='not-found'||c==='failed-precondition')return 'O banco Firestore ainda não foi criado neste projeto.';
+  if(c==='unavailable')return 'Sem conexão com a nuvem agora.';
+  return 'Erro ao salvar na nuvem'+(c?' ('+c+')':'')+'.';
+}
+function schedulePush(){
+  clearTimeout(pushT);
+  pushT=setTimeout(()=>{pushNow().then(()=>{},err=>{SYNC.ok=false;SYNC.msg=fsMsg(err);toast(SYNC.msg)})},1500);
+}
 async function pushNow(){
   if(!U)return;
-  await firebase.firestore().collection('otakuvault').doc(U.uid).set({data:JSON.stringify(S),updated:Date.now()});
+  await firebase.firestore().collection('otakuvault').doc(U.uid).set({data:payload(),updated:Date.now()});
+  SYNC.ok=true;SYNC.msg='';SYNC.t=Date.now();
 }
 async function syncDown(known){
   try{
@@ -969,7 +993,7 @@ async function syncDown(known){
     if(known){applyState(mergeState(S,o));syncOn=true;await pushNow();renderView(true);toast('Coleção sincronizada');return}
     pendingCloud=Object.assign({name:S.name},o);
     showDlg(`<div class="lab" style="margin-top:0">Qual coleção você quer usar?</div><div class="note">Encontramos uma coleção salva nesta conta e também dados neste aparelho. Escolha qual manter. A outra será substituída.</div><div class="acts"><button class="btn" data-a="usecloud">Usar a da nuvem</button><button class="btn ghost" data-a="keeplocal">Manter deste aparelho</button></div>`);
-  }catch(err){toast('Conectado, mas não consegui sincronizar agora.')}
+  }catch(err){SYNC.ok=false;SYNC.msg=fsMsg(err);toast('Conectado, mas '+SYNC.msg.charAt(0).toLowerCase()+SYNC.msg.slice(1))}
 }
 async function onUser(user){
   const known=lastUid()===user.uid;
@@ -999,7 +1023,7 @@ async function initAuth(){
   }
 }
 function cloudBox(){
-  if(U)return `<div class="note">Conectado como <b>${esc(U.displayName||U.email||'sua conta')}</b>. Sua coleção é salva na nuvem automaticamente.</div><div class="row2"><button class="btn ghost" data-a="fbsave">Sincronizar agora</button><button class="btn ghost" data-a="fbload">Baixar da nuvem</button><button class="btn danger" data-a="fblogout">Sair</button></div>`;
+  if(U)return `<div class="note">Conectado como <b>${esc(U.displayName||U.email||'sua conta')}</b>. Sua coleção é salva na nuvem automaticamente.</div>${SYNC.ok===false?'<div class="aerr" style="min-height:0">'+esc(SYNC.msg)+'</div>':(SYNC.ok?'<div class="note">Última sincronização: '+new Date(SYNC.t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</div>':'')}${SYNC.warn?'<div class="note" style="color:#ffd98a">'+esc(SYNC.warn)+'</div>':''}<div class="row2"><button class="btn ghost" data-a="fbsave">Sincronizar agora</button><button class="btn ghost" data-a="fbload">Baixar da nuvem</button><button class="btn danger" data-a="fblogout">Sair</button></div>`;
   const cfg=!!getCfg();
   return `<div class="note">${cfg?'Você está sem conta: seus animes ficam só neste aparelho e somem se você desinstalar o app. Crie uma conta para guardar tudo na nuvem e recuperar em qualquer aparelho.':cloudText()}</div><div class="row2">${cfg?'<button class="btn" data-a="showauth">Criar conta</button><button class="btn ghost" data-a="showauthin">Já tenho conta</button>':'<button class="btn ghost" data-a="fbcfg">Configurar Firebase</button>'}</div>`;
 }
